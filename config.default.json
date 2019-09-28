@@ -1,0 +1,12 @@
+{
+  "messageGateway": {
+    "discord": {
+      "botToken": "",
+    }
+  },
+  "homeAPI": {
+    "hue": {
+
+    }
+  }
+}
