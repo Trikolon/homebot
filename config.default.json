@@ -2,11 +2,20 @@
   "messageGateway": {
     "discord": {
       "botToken": "",
+      "userWhitelist": [],
+      "commandPrefix": "!homebot",
+      "channels": {}
     }
   },
   "homeAPI": {
     "hue": {
-
+      "ip": "auto",
+      "appName": "homebot",
+      "deviceName": "rpi",
+      "auth": {
+        "username": "",
+        "clientkey": ""
+      }
     }
   }
 }
