@@ -4,7 +4,8 @@
       "botToken": "",
       "userWhitelist": [],
       "commandPrefix": "!homebot",
-      "channels": {}
+      "subscriptions": {},
+      "statusChannel": ""
     }
   },
   "homeAPI": {
@@ -15,6 +16,10 @@
       "auth": {
         "username": "",
         "clientkey": ""
+      },
+      "sensors": {
+        "sensorPollRate": 5000,
+        "pollSensorIds": []
       }
     }
   }

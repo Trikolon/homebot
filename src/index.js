@@ -17,4 +17,11 @@ const config = require('../config.json');
   } catch (error) {
     console.error('Error while initializing Discord!', error.message);
   }
+
+  const sensorSubChannel = config.messageGateway.discord.subscriptions.sensor;
+  if (sensorSubChannel) {
+    hue.on('sensor', (sensor) => {
+      discord.sendMessage(sensorSubChannel, `**Sensor update** ${sensor.name}: \`\`\`json\n${JSON.stringify(sensor.state)}\n\`\`\``);
+    });
+  }
 }());

@@ -1,22 +1,45 @@
 const { v3 } = require('node-hue-api');
+const EventEmitter = require('events');
 
 const { discovery } = v3;
 const hueApi = v3.api;
 
-module.exports = class PhilipsHue {
+module.exports = class PhilipsHue extends EventEmitter {
   constructor(config) {
+    super();
     const {
-      ip, appName, deviceName, auth,
+      ip, appName, deviceName, auth, sensors,
     } = config;
-    if (!ip || !appName || !deviceName || !auth) {
+    if (!ip || !appName || !deviceName || !auth || !sensors) {
       throw new Error('Invalid configuration. Missing required fields.');
     }
     this.ip = ip;
     this.appName = appName;
     this.deviceName = deviceName;
     this.auth = auth;
+    this.sensorCfg = sensors;
 
     this.api = null;
+
+    this.pollSensors = {};
+    this.sensorCfg.pollSensorIds.forEach((id) => {
+      this.pollSensors[id] = {};
+    });
+
+
+    this.on('newListener', (event) => {
+      console.debug('newListener', event);
+      if (event === 'sensor') {
+        this._sensorPolling(true);
+      }
+    });
+
+    this.on('removeListener', (event) => {
+      console.debug('removeListener', event);
+      if (event === 'sensor' && this.listenerCount('sensor') === 0) {
+        this._sensorPolling(false);
+      }
+    });
   }
 
   async init() {
@@ -78,5 +101,37 @@ module.exports = class PhilipsHue {
         throw new Error(`Unexpected Error: ${err.message}`);
       }
     }
+  }
+
+  _sensorPolling(status) {
+    if (!status && this._sensorPollingInterval) {
+      console.debug('Stopping sensor polling');
+      clearInterval(this._sensorPollingInterval);
+      this._sensorPollingInterval = null;
+      return;
+    }
+    if (this._sensorPollingInterval) {
+      // Already started
+      return;
+    }
+    console.debug('Starting sensor polling');
+    this._sensorPollingInterval = setInterval(() => {
+      Object.entries(this.pollSensors).forEach(async ([sensorId, pollSensor]) => {
+        const sensor = await this.api.sensors.get(sensorId);
+        if (!sensor) {
+          console.warn('Could not find sensor by id', sensorId);
+          console.warn('Removing it from poll list');
+          delete this.pollSensors[sensorId];
+          return;
+        }
+        if (pollSensor && pollSensor.state
+          && pollSensor.state.lastupdated === sensor.state.lastupdated) {
+          // Skip already emitted sensor values
+          return;
+        }
+        this.pollSensors[sensorId].state = sensor.state;
+        this.emit('sensor', sensor);
+      });
+    }, this.sensorCfg.sensorPollRate);
   }
 };
