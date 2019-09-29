@@ -3,6 +3,7 @@ const PhilipsHue = require('./homeAPI/PhilipsHue');
 const CommandHandler = require('./cmd/CommandHandler');
 const config = require('../config.json');
 
+const locale = config.locale || 'en-US';
 
 (async function main() {
   const hue = new PhilipsHue(config.homeAPI.hue);
@@ -17,6 +18,11 @@ const config = require('../config.json');
           discord.sendMessage(sensorSubChannel, `**Sensor update** ${sensor.name}: \`\`\`json\n${JSON.stringify(sensor.state)}\n\`\`\``);
         });
       }
+      const motionSubChannel = config.messageGateway.discord.subscriptions.motion;
+      hue.on('motion', (sensor) => {
+        discord.sendMessage(motionSubChannel,
+          `**Motion detected!**\n**Sensor**: ${sensor.name}\n**Time**: ${new Date(sensor.state.lastupdated).toLocaleString(locale)}`);
+      });
     })
     .catch((error) => {
       console.error('Error while initialising!', error.message);

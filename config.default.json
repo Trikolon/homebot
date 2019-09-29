@@ -4,7 +4,10 @@
       "botToken": "",
       "userWhitelist": [],
       "commandPrefix": "!homebot",
-      "subscriptions": {},
+      "subscriptions": {
+        "sensor": "",
+        "motion": ""
+      },
       "statusChannel": ""
     }
   },
@@ -19,8 +22,10 @@
       },
       "sensors": {
         "sensorPollRate": 5000,
-        "pollSensorIds": []
+        "pollSensorIds": [],
+        "motionAlarmSensorIds": []
       }
     }
-  }
+  },
+  "locale": "en-US"
 }

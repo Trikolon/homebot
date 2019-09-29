@@ -40,6 +40,17 @@ module.exports = class PhilipsHue extends EventEmitter {
         this._sensorPolling(false);
       }
     });
+
+    // Motion alarm
+    const motionAlarmIds = this.sensorCfg.motionAlarmSensorIds;
+    if (motionAlarmIds.length > 0) {
+      // Only register self listener if sensors are configured. This prevents unnecessary polling.
+      this.on('sensor', (sensor) => {
+        if (motionAlarmIds.includes(sensor.id) && sensor.state.presence) {
+          this.emit('motion', sensor);
+        }
+      });
+    }
   }
 
   async init() {
