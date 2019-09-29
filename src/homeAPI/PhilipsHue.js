@@ -71,6 +71,13 @@ module.exports = class PhilipsHue extends EventEmitter {
     return `Connected to Hue Bridge: ${bridgeConfig.name} :: ${bridgeConfig.ipaddress}`;
   }
 
+  async getSensor(id) {
+    if (!this.api) {
+      return null;
+    }
+    return this.api.sensors.get(id);
+  }
+
   async _discoverBridge() {
     const discoveryResults = await discovery.nupnpSearch();
     if (discoveryResults.length === 0) {

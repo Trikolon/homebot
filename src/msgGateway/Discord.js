@@ -64,6 +64,21 @@ module.exports = class DiscordGateway extends MsgGateway {
     this.emit('command',
       this.commandPrefix,
       args,
-      (reply) => message.reply(reply));
+      // Handle reply from command handler
+      (reply) => {
+        if (typeof reply !== 'string') {
+          message.reply(this._jsonToDiscordMsgString(reply));
+          return;
+        }
+        message.reply(reply);
+      });
+  }
+
+  _jsonToDiscordMsgString(json) {
+    try {
+      return `\`\`\`json\n${JSON.stringify(json, null, 2)}\n\`\`\``;
+    } catch (err) {
+      return 'Error while serializing message.';
+    }
   }
 };
