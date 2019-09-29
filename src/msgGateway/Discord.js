@@ -1,7 +1,10 @@
 const Discord = require('discord.js');
 
-module.exports = class DiscordGateway {
+const MsgGateway = require('./MsgGateway');
+
+module.exports = class DiscordGateway extends MsgGateway {
   constructor(config) {
+    super();
     const {
       botToken, userWhitelist, commandPrefix, statusChannel,
     } = config;
@@ -55,6 +58,12 @@ module.exports = class DiscordGateway {
       || !this.userWhitelist.includes(message.author.id)) {
       return;
     }
-    message.reply('Hi, youre whitelisted!');
+
+    const args = message.content.split(' ');
+    args.shift();
+    this.emit('command',
+      this.commandPrefix,
+      args,
+      (reply) => message.reply(reply));
   }
 };

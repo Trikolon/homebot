@@ -59,9 +59,16 @@ module.exports = class PhilipsHue extends EventEmitter {
     // Create a new API instance that is authenticated with the new user we created
     this.api = await hueApi.create(this.ip, this.auth.username, this.auth.clientkey);
 
-    // Do something with the authenticated user/api
+    // Log connection status
+    console.info(await this.getStatusMsg());
+  }
+
+  async getStatusMsg() {
+    if (!this.api) {
+      return 'Not connected';
+    }
     const bridgeConfig = await this.api.configuration.get();
-    console.info(`Connected to Hue Bridge: ${bridgeConfig.name} :: ${bridgeConfig.ipaddress}`);
+    return `Connected to Hue Bridge: ${bridgeConfig.name} :: ${bridgeConfig.ipaddress}`;
   }
 
   async _discoverBridge() {
