@@ -21,7 +21,7 @@ const locale = config.locale || 'en-US';
       const motionSubChannel = config.messageGateway.discord.subscriptions.motion;
       hue.on('motion', (sensor) => {
         discord.sendMessage(motionSubChannel,
-          `**Motion detected!**\n**Sensor**: ${sensor.name}\n**Time**: ${new Date(sensor.state.lastupdated).toLocaleString(locale)}`);
+          `**Motion detected!**\n**Sensor**: ${sensor.name}\n**Time**: ${new Date(sensor.state.lastupdated).toLocaleString(locale)}\n@everyone`);
       });
     })
     .catch((error) => {
