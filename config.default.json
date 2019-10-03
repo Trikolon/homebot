@@ -23,7 +23,10 @@
       "sensors": {
         "sensorPollRate": 5000,
         "pollSensorIds": [],
-        "motionAlarmSensorIds": []
+        "motionAlarm": {
+          "enabled": false,
+          "sensorIds": []
+        }
       }
     }
   },

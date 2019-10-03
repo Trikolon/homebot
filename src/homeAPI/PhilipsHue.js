@@ -41,16 +41,27 @@ module.exports = class PhilipsHue extends EventEmitter {
       }
     });
 
-    // Motion alarm
-    const motionAlarmIds = this.sensorCfg.motionAlarmSensorIds;
-    if (motionAlarmIds.length > 0) {
-      // Only register self listener if sensors are configured. This prevents unnecessary polling.
-      this.on('sensor', (sensor) => {
-        if (motionAlarmIds.includes(sensor.id) && sensor.state.presence) {
-          this.emit('motion', sensor);
-        }
-      });
+    // Initially, only register self listener if motion alarm is enabled and sensors are configured.
+    // This prevents unnecessary polling.
+    const { motionAlarm } = this.sensorCfg;
+    this.motionAlarm = motionAlarm.enabled && motionAlarm.sensorIds.length > 0;
+  }
+
+  set motionAlarm(state) {
+    // Setting the same state is a no-op
+    if (this._motionAlarmEnabled === state) {
+      return;
     }
+    if (state) {
+      this.on('sensor', this._motionListener);
+    } else {
+      this.removeListener('sensor', this._motionListener);
+    }
+    this._motionAlarmEnabled = state;
+  }
+
+  get motionAlarm() {
+    return this._motionAlarmEnabled;
   }
 
   async init() {
@@ -97,6 +108,12 @@ module.exports = class PhilipsHue extends EventEmitter {
     // Ignoring that you could have more than one Hue Bridge on a network as this is unlikely
     // in 99.9% of users situations
     this.ip = discoveryResults[0].ipaddress;
+  }
+
+  _motionListener(sensor) {
+    if (sensor.state.presence && this.sensorCfg.motionAlarm.sensorIds.includes(sensor.id)) {
+      this.emit('motion', sensor);
+    }
   }
 
   async _createNewUser() {

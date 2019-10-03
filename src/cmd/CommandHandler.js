@@ -12,7 +12,7 @@ module.exports = class CommandHandler {
   async _onCommand(prefix, args, callback) {
     console.debug('onCommand', { prefix, args, callback });
     if (!args || args.length === 0) {
-      callback('Hi, I\'m HomeBot! Available commands: !status');
+      callback('Hi, I\'m HomeBot! Available commands: `!status`, `!hue`');
       return;
     }
 
@@ -41,6 +41,11 @@ module.exports = class CommandHandler {
           }
           default: {
             callback('Unknown hue command.');
+            break;
+          }
+          case 'togglealarm': {
+            this.hue.motionAlarm = !this.hue.motionAlarm;
+            callback(`${this.hue.motionAlarm ? 'Enabled' : 'Disabled'} motion alarm!`);
             break;
           }
         }
