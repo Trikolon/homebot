@@ -10,11 +10,11 @@
   "license": "MIT",
   "dependencies": {
     "discord.js": "^11.5.1",
-    "node-hue-api": "^3.1.4"
+    "node-hue-api": "^4.0.5"
   },
   "devDependencies": {
-    "eslint": "^6.4.0",
+    "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-plugin-import": "^2.18.2"
+    "eslint-plugin-import": "^2.20.1"
   }
 }
