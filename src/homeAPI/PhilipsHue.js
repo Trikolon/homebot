@@ -79,7 +79,7 @@ module.exports = class PhilipsHue extends EventEmitter {
       await this._createNewUser();
     }
     // Create a new API instance that is authenticated with the new user we created
-    this.api = await hueApi.create(this.ip, this.auth.username, this.auth.clientkey);
+    this.api = await hueApi.createLocal(this.ip).connect(this.auth.username);
 
     // Log connection status
     console.info(await this.getStatusMsg());
@@ -89,7 +89,7 @@ module.exports = class PhilipsHue extends EventEmitter {
     if (!this.api) {
       return 'Not connected';
     }
-    const bridgeConfig = await this.api.configuration.get();
+    const bridgeConfig = await this.api.configuration.getConfiguration();
     return `Connected to Hue Bridge: ${bridgeConfig.name} :: ${bridgeConfig.ipaddress}`;
   }
 
@@ -97,7 +97,7 @@ module.exports = class PhilipsHue extends EventEmitter {
     if (!this.api) {
       return null;
     }
-    return this.api.sensors.get(id);
+    return this.api.sensors.getSensor(id);
   }
 
   async _discoverBridge() {
@@ -122,7 +122,7 @@ module.exports = class PhilipsHue extends EventEmitter {
     }
 
     // Create an unauthenticated instance of the Hue API so that we can create a new user
-    const unauthenticatedApi = await hueApi.create(this.ip);
+    const unauthenticatedApi = await hueApi.createLocal(this.ip).connect();
 
     let user;
     try {
@@ -137,7 +137,7 @@ module.exports = class PhilipsHue extends EventEmitter {
       this.auth.username = user.username;
       this.auth.clientkey = user.clientkey;
     } catch (err) {
-      if (err.getHueErrorType() === 101) {
+      if (err.getHueErrorType && err.getHueErrorType() === 101) {
         throw new Error('The Link button on the bridge was not pressed. Please press the Link button and try again.');
       } else {
         throw new Error(`Unexpected Error: ${err.message}`);
@@ -159,7 +159,7 @@ module.exports = class PhilipsHue extends EventEmitter {
     console.debug('Starting sensor polling');
     this._sensorPollingInterval = setInterval(() => {
       Object.entries(this.pollSensors).forEach(async ([sensorId, pollSensor]) => {
-        const sensor = await this.api.sensors.get(sensorId);
+        const sensor = await this.api.sensors.getSensor(sensorId);
         if (!sensor) {
           console.warn('Could not find sensor by id', sensorId);
           console.warn('Removing it from poll list');

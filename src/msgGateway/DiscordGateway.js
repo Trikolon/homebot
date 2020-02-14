@@ -44,6 +44,7 @@ module.exports = class DiscordGateway extends MsgGateway {
     return this.client.channels.get(channelId).send(message);
   }
 
+  // eslint-disable-next-line class-methods-use-this
   _errorHandler(error, level) {
     if (!['debug', 'warn', 'error'].includes(level)) {
       throw new Error('Invalid log level');
@@ -74,6 +75,7 @@ module.exports = class DiscordGateway extends MsgGateway {
       });
   }
 
+  // eslint-disable-next-line class-methods-use-this
   _jsonToDiscordMsgString(json) {
     try {
       return `\`\`\`json\n${JSON.stringify(json, null, 2)}\n\`\`\``;

@@ -1,12 +1,14 @@
 module.exports = class CommandHandler {
-  constructor(msgGateway, hue) {
-    if (!msgGateway || !hue) {
-      throw new Error('MsgGateway and PhilipsHue references are mandatory.');
+  constructor(msgGateways, hue) {
+    if (!msgGateways || !hue) {
+      throw new Error('MsgGateways and PhilipsHue references are mandatory.');
     }
     this.hue = hue;
-    this.msgGateway = msgGateway;
+    this.msgGateways = msgGateways;
 
-    msgGateway.on('command', (...args) => this._onCommand(...args));
+    this.msgGateways.forEach(
+      (gateway) => gateway.on('command', (...args) => this._onCommand(...args)),
+    );
   }
 
   async _onCommand(prefix, args, callback) {
@@ -29,14 +31,14 @@ module.exports = class CommandHandler {
         }
         switch (args[1]) {
           case 'sensor': {
-            let sensorData;
+            let sensor;
             try {
-              sensorData = await this.hue.getSensor(args[2]);
+              sensor = await this.hue.getSensor(args[2]);
             } catch (error) {
               callback(`Error while getting sensor data: ${error.message}`);
               break;
             }
-            callback(sensorData);
+            callback(sensor && sensor.getJsonPayload());
             break;
           }
           default: {
