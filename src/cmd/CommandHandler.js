@@ -49,13 +49,24 @@ module.exports = class CommandHandler extends EventEmitter {
             callback(sensor);
             break;
           }
-          default: {
-            callback('Unknown hue command.');
-            break;
-          }
           case 'togglealarm': {
             this.hue.motionAlarm = !this.hue.motionAlarm;
             callback(`${this.hue.motionAlarm ? 'Enabled' : 'Disabled'} motion alarm!`);
+            break;
+          }
+          case 'temperature': {
+            let readings;
+            try {
+              readings = await this.hue.getTemperatureReadings();
+            } catch (error) {
+              callback(`Error while getting temperature readings: ${error.message}`);
+              break;
+            }
+            callback(readings);
+            break;
+          }
+          default: {
+            callback('Unknown hue command.');
             break;
           }
         }

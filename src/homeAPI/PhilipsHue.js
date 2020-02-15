@@ -102,6 +102,24 @@ module.exports = class PhilipsHue extends EventEmitter {
     return sensorObject && sensorObject.getJsonPayload();
   }
 
+  /**
+   * Discovers all connected temperature sensors and returns their current readings
+   * @returns {Promise<void>}
+   */
+  async getTemperatureReadings() {
+    if (!this.api) {
+      return null;
+    }
+    const sensors = await this.api.sensors.getAll();
+    return sensors.map((sensor) => sensor && sensor.getJsonPayload())
+      .filter((sensor) => sensor != null && (sensor.type === 'ZLLTemperature' || sensor.type === 'CLIPTemperature'))
+      .map((tempSensor) => ({
+        name: tempSensor.name,
+        temperature: tempSensor.state && tempSensor.state.temperature / 100,
+        lastupdated: tempSensor.state && tempSensor.state.lastupdated,
+      }));
+  }
+
   async _discoverBridge() {
     const discoveryResults = await discovery.nupnpSearch();
     if (discoveryResults.length === 0) {
