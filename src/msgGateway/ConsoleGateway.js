@@ -20,6 +20,9 @@ module.exports = class ConsoleGateway extends MsgGateway {
   }
 
   _messageHandler(message) {
+    if (message.length === 0) {
+      return;
+    }
     const args = message.split(' ');
     this.emit('command',
       null,
