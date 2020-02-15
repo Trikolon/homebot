@@ -97,7 +97,8 @@ module.exports = class PhilipsHue extends EventEmitter {
     if (!this.api) {
       return null;
     }
-    return this.api.sensors.getSensor(id);
+    const sensorObject = this.api.sensors.getSensor(id);
+    return sensorObject && sensorObject.getJsonPayload();
   }
 
   async _discoverBridge() {
@@ -159,7 +160,8 @@ module.exports = class PhilipsHue extends EventEmitter {
     console.debug('Starting sensor polling');
     this._sensorPollingInterval = setInterval(() => {
       Object.entries(this.pollSensors).forEach(async ([sensorId, pollSensor]) => {
-        const sensor = await this.api.sensors.getSensor(sensorId);
+        const sensorObject = await this.api.sensors.getSensor(sensorId);
+        const sensor = sensorObject && sensorObject.getJsonPayload();
         if (!sensor) {
           console.warn('Could not find sensor by id', sensorId);
           console.warn('Removing it from poll list');

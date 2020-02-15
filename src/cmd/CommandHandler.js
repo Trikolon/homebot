@@ -46,7 +46,7 @@ module.exports = class CommandHandler extends EventEmitter {
               callback(`Error while getting sensor data: ${error.message}`);
               break;
             }
-            callback(sensor && sensor.getJsonPayload());
+            callback(sensor);
             break;
           }
           default: {
