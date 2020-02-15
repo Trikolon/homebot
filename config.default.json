@@ -28,6 +28,9 @@
           "sensorIds": []
         }
       }
+    },
+    "speedTest": {
+      "token": ""
     }
   },
   "locale": "en-US"

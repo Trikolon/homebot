@@ -10,6 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "discord.js": "^11.5.1",
+    "fast-speedtest-api": "^0.3.2",
     "node-hue-api": "^4.0.5"
   },
   "devDependencies": {

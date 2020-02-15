@@ -1,12 +1,13 @@
 const EventEmitter = require('events');
 
 module.exports = class CommandHandler extends EventEmitter {
-  constructor(msgGateways, hue) {
+  constructor(msgGateways, hue, speedTest) {
     super();
     if (!msgGateways || !hue) {
       throw new Error('MsgGateways and PhilipsHue references are mandatory.');
     }
     this.hue = hue;
+    this.speedTest = speedTest;
     this.msgGateways = msgGateways;
 
     this.msgGateways.forEach(
@@ -17,7 +18,7 @@ module.exports = class CommandHandler extends EventEmitter {
   async _onCommand(prefix, args, callback) {
     console.debug('onCommand', { prefix, args, callback });
     if (!args || args.length === 0) {
-      callback('Hi, I\'m HomeBot! Available commands: `stop`, `status`, `hue`');
+      callback('Hi, I\'m HomeBot! Available commands: `stop`, `status`, `hue`, `speedtest`');
       return;
     }
 
@@ -29,6 +30,26 @@ module.exports = class CommandHandler extends EventEmitter {
       }
       case 'status': {
         callback(await this.hue.getStatusMsg());
+        break;
+      }
+      case 'speedtest': {
+        if (!this.speedTest) {
+          callback('Speed test module not loaded.');
+          break;
+        }
+        if (this.speedTest.testRunning) {
+          callback('Speedtest already running, please wait.');
+          break;
+        }
+        callback('Running speedtest against "fast.com" ...');
+        let testResult;
+        try {
+          testResult = await this.speedTest.runTest();
+        } catch (error) {
+          callback(`Error while running speedtest: ${error.message}`);
+          break;
+        }
+        callback(`Test result: ${testResult}`);
         break;
       }
       case 'hue': {
