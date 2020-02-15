@@ -25,6 +25,11 @@ const locale = config.locale || 'en-US';
         discordGateway.sendMessage(motionSubChannel,
           `**Motion detected!**\n**Sensor**: ${sensor.name}\n**Time**: ${new Date(sensor.state.lastupdated).toLocaleString(locale)}\n@everyone`);
       });
+
+      commandHandler.on('shutdown', () => {
+        console.debug('Command handler shutdown request');
+        process.exit(0);
+      });
     })
     .catch((error) => {
       console.error('Error while initialising!', error.message);
